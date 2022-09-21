@@ -2,6 +2,14 @@
 <div class="toolbar" role="banner">
   <h1>angular works!</h1>
 </div>
-<div echarts [options]="options" class="demo-chart" style="height:600px; width:1200px;"></div>
+<div echarts
+     [options]="options"
+     (chartDblClick)="onChartDbClick($event)"
+     (chartClick)="onChartClick($event)"
+     class="demo-chart"
+     id="graph"
+     style="height:600px; width:1200px;">
+
+</div>
 
 <router-outlet></router-outlet>

@@ -1,6 +1,8 @@
-import {Component, OnInit} from "@angular/core";
-import {EChartsOption} from "echarts";
+import {Component, Inject} from "@angular/core";
 import {GraphService} from "./graph.service";
+import { DOCUMENT } from '@angular/common';
+import {EChartsOption} from "echarts";
+
 
 @Component({
   selector: "app-root",
@@ -8,32 +10,132 @@ import {GraphService} from "./graph.service";
   styleUrls: ["./app.component.css"]
 })
 export class AppComponent {
-  // graph = jsondata
-  options: any
 
-  constructor(private graphService: GraphService) {
+  options: any
+  clickEvent: any
+
+  fixedChart: any
+
+
+  constructor(private graphService: GraphService, @Inject(DOCUMENT) document: Document) {
+    this.onChartClick()
     this.graphService.shortestPath("", "","","","","").subscribe(
       (response) => {
-        console.log('response received')
+        console.log("response", response)
         this.options = {
+          animationEasingUpdate: 'quinticInOut',
           title: {
             text: 'Graph-Demo',
-            subtext: 'Default layout',
             top: 'bottom',
             left: 'right'
           },
-          tooltip: {},
+          tooltip: {
+            trigger: 'item',
+          },
           legend: [
             {
-              // selectedMode: 'single',
               data: response.categories.map(function (a: any) {
                 return a.name;
               })
             }
           ],
+          graphic: [
+            {
+              type: 'group',
+              bounding: 'all',
+              right: 50 + 70,
+              top: 50,
+              invisible: false,
+              children: [
+                {
+                  type: 'circle',
+                  id: 'circle',
+                  left: 'center',
+                  top: 'center',
+                  silent: true,
+                  invisible: false,
+                  shape: {
+                    r: 50
+                  },
+                  style: {
+                    fill: 'rgba(0,0,0,0.3)'
+                  }
+                },
+                {
+                  type: 'text',
+                  id: 'text',
+                  right: 'center',
+                  top: 'center',
+                  silent: true,
+                  invisible: false,
+                  style: {
+                    fill: '#fff',
+                    text: 'test',
+                    textAlign: 'middle',
+                    font: '13px Microsoft YaHei'
+                  }
+                },
+                {
+                  type: 'sector',
+                  id: 'right_ring',
+                  invisible: false,
+                  shape: {
+                    r: 70,
+                    r0: 50,
+                    startAngle: -Math.PI / 2,
+                    endAngle: Math.PI / 2
+                  },
+                  left: '100%',
+                  top: 'center',
+                  style: {
+                    fill: '#F0F8FF'
+                  },
+                  onmouseover: function () {
+                    this.style.fill = '#76eec6'
+                  },
+                  onmouseout: function () {
+                    this.style.fill = '#F0F8FF'
+                  },
+                  onclick: function () {
+                    // @ts-ignore
+                    this.parent._children.map(function (element: any) {
+                      element.invisible = true;
+                      return element
+                    })
+                  }
+                },
+                {
+                  type: 'sector',
+                  id: 'left_ring',
+                  invisible: false,
+                  shape: {
+                    r: 70,
+                    r0: 50,
+                    startAngle: Math.PI / 2,
+                    endAngle: Math.PI * 1.5
+                  },
+                  right: '50%',
+                  top: 'center',
+                  style: {
+                    fill: '#F0F8FF'
+                  },
+                  onmouseover: function () {
+                    this.style.fill = '#76eec6'
+                  },
+                  onmouseout: function () {
+                    this.style.fill = '#F0F8FF'
+                  },
+                  onclick: function () {
+                    // @ts-ignore
+                    this.parent._children.map(function (element: any) {
+                      element.invisible = true;
+                      return element
+                    })
+                  }
+                }]
+            }],
           series: [
             {
-              name: 'Graph-Demo',
               type: 'graph',
               layout: 'force',
               symbolSize: 30,
@@ -46,11 +148,11 @@ export class AppComponent {
               select: {
                 label: {
                   show: true
-                }
+                },
               },
               force: {
                 edgeLength: 100,
-                repulsion: 400,
+                repulsion: 100,
                 gravity: 0.01,
                 friction: 0.5,
                 layoutAnimation: true
@@ -61,21 +163,29 @@ export class AppComponent {
               lineStyle: {
                 curveness: 0.1
               },
+              emphasis: {
+                focus: 'self'
+              },
+              labelLayout: function () {
+                return {
+                  draggable: true,
+                  y: '10%',
+                  moveOverlap: 'shiftY'
+                };
+              },
               label: {
-                // normal: {
-                //   position: 'right',
-                //   show: true
-                // },
                 position: 'right',
                 distance: 10,
-                formatter: function(params: { value: any[]; }){
+                fontStyle: 'oblique',
+                backgroundColor: 'inherit',
+                formatter: function (params: any) {
                   let properties = ""
-                  Object.keys(params.value).forEach(function(key) {
+                  Object.keys(params.value).forEach(function (key) {
                     // @ts-ignore
                     properties += key + ": " + params.value[key] + "\n";
                   })
                   return properties
-                } // also support "rich-test"
+                }
               },
               data: response.nodes.map(function (node: any) {
                 return node
@@ -89,18 +199,26 @@ export class AppComponent {
             }
           ]
         };
+
       },
-      (error) => {                              //error() callback
-        console.error('Request failed with error')
-      },
-      () => {                                   //complete() callback
-        console.info('Request completed')      //This is actually not needed
+      (error) => {
+        console.error('Request failed with error', error)
       })
   }
-  // ngOnInit(): void {
-  //   // this.graph.nodes.forEach(function (node: any) {
-  //   //   node.symbolSize = 5;
-  //   // });
-  // }
 
+  onChartDbClick(ec: any) {
+    console.log("double-click:", ec)
+    this.clickEvent = ec
+  }
+
+  onChartClick(ec: any) {
+    if (ec.componentType == 'series') {
+      console.log("single-click", ec)
+      this.options.graphic.invisible = false;
+    }
+  }
+
+  // onClick() {
+  //   this.options.graphic.onmouseover()
+  // }
 }

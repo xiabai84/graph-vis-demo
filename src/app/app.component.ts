@@ -1,7 +1,10 @@
-import {Component, Inject} from "@angular/core";
+import {Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {GraphService} from "./graph.service";
 import { DOCUMENT } from '@angular/common';
 import {EChartsOption} from "echarts";
+import {take, takeUntil} from "rxjs/operators";
+import {Subject} from "rxjs";
+import {NgxEchartsDirective} from "ngx-echarts";
 
 
 @Component({
@@ -9,17 +12,28 @@ import {EChartsOption} from "echarts";
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.css"]
 })
-export class AppComponent {
+export class AppComponent implements OnInit, OnDestroy {
+  private _destroy$ = new Subject<void>();
 
   options: any
   clickEvent: any
 
+  // @ViewChild("graph")
+  // graphElem: NgxEchartsDirective
+
   fixedChart: any
 
+  constructor(private graphService: GraphService, @Inject(DOCUMENT) document: Document) {}
 
-  constructor(private graphService: GraphService, @Inject(DOCUMENT) document: Document) {
-    this.onChartClick()
-    this.graphService.shortestPath("", "","","","","").subscribe(
+  ngOnDestroy(): void {
+    this._destroy$.next();
+    this._destroy$.complete();
+  }
+
+  ngOnInit(): void {
+    this.graphService.shortestPath("", "","","","","")
+      .pipe(take(1))
+      .subscribe(
       (response) => {
         console.log("response", response)
         this.options = {
@@ -91,18 +105,20 @@ export class AppComponent {
                     fill: '#F0F8FF'
                   },
                   onmouseover: function () {
-                    this.style.fill = '#76eec6'
+                    console.log('this: ', this);
+                    this.style.fill = '#76eec6' // "this" ist hier irgendwas innerhalb der echart-lib
                   },
                   onmouseout: function () {
                     this.style.fill = '#F0F8FF'
                   },
-                  onclick: function () {
-                    // @ts-ignore
-                    this.parent._children.map(function (element: any) {
-                      element.invisible = true;
-                      return element
-                    })
-                  }
+                  onclick: this.onClick.bind(this)
+                  // onclick: function () {
+                  //   // @ts-ignore
+                  //   this.parent._children.map(function (element: any) {
+                  //     element.invisible = true;
+                  //     return element
+                  //   })
+                  // }
                 },
                 {
                   type: 'sector',
@@ -218,7 +234,8 @@ export class AppComponent {
     }
   }
 
-  // onClick() {
-  //   this.options.graphic.onmouseover()
-  // }
+  onClick(event: MouseEvent|null = null) {
+    console.log('event: ', event);
+    this.options.graphic[0].children[2].onmouseover() // achtung, damit is in zeile 108 das "this" ein pointer auf AppComponent Instanz, statt
+  }
 }

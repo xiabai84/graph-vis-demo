@@ -11,13 +11,8 @@ import {Subject} from "rxjs";
 })
 export class AppComponent implements OnInit, OnDestroy {
   private _destroy$ = new Subject<void>();
-
   options: any
-  newOptions: any
   echartsInstance: any
-
-  // @ViewChild("graph")
-  // graphElem: NgxEchartsDirective | undefined
 
   constructor(private graphService: GraphService) {}
 
@@ -27,7 +22,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.graphService.shortestPath("", "","","","","")
+    this.graphService.ontology("", "","","","","")
       .pipe(take(1))
       .subscribe(
       (response) => {
@@ -44,7 +39,7 @@ export class AppComponent implements OnInit, OnDestroy {
           legend: [
             {
               data: response.categories.map(function (a: any) {
-                return a.name;
+                return a.name
               })
             }
           ],
@@ -79,7 +74,7 @@ export class AppComponent implements OnInit, OnDestroy {
                   invisible: true,
                   style: {
                     fill: '#fff',
-                    text: '',
+                    text: 'text',
                     textAlign: 'middle',
                     font: '13px Microsoft YaHei'
                   }
@@ -100,7 +95,7 @@ export class AppComponent implements OnInit, OnDestroy {
                     fill: '#F0F8FF',
                   },
                   onmouseover: function () {
-                    this.style.fill = '#76eec6' // "this" ist hier irgendwas innerhalb der echart-lib
+                    this.style.fill = '#76eec6'
                   },
                   onmouseout: function () {
                     this.style.fill = '#F0F8FF'
@@ -117,7 +112,7 @@ export class AppComponent implements OnInit, OnDestroy {
                     startAngle: Math.PI / 2,
                     endAngle: Math.PI * 1.5
                   },
-                  right: '50%',
+                  right: '100%',
                   top: 'center',
                   style: {
                     fill: '#F0F8FF'
@@ -160,9 +155,6 @@ export class AppComponent implements OnInit, OnDestroy {
               lineStyle: {
                 curveness: 0.1
               },
-              emphasis: {
-                focus: 'self'
-              },
               labelLayout: function () {
                 return {
                   draggable: true,
@@ -177,6 +169,7 @@ export class AppComponent implements OnInit, OnDestroy {
                 backgroundColor: 'inherit',
                 formatter: function (params: any) {
                   let properties = ""
+                  console.log("params", params)
                   Object.keys(params.value).forEach(function (key) {
                     // @ts-ignore
                     properties += key + ": " + params.value[key] + "\n";
@@ -184,11 +177,20 @@ export class AppComponent implements OnInit, OnDestroy {
                   return properties
                 }
               },
+              edgeLabel: {
+                normal: {
+                  show: true,
+                  formatter: function (params: any) {
+                    return params.data.label
+                  }
+                }
+              },
               data: response.nodes.map(function (node: any) {
+                console.log("node", node)
                 return node
               }),
-              links: response.links.map(function (links: any) {
-                return links
+              links: response.links.map(function (link: any) {
+                return link
               }),
               categories: response.categories.map(function (category: any) {
                 return category
@@ -203,8 +205,8 @@ export class AppComponent implements OnInit, OnDestroy {
       })
   }
 
-  onChartDbClick(ec: any) {
-    console.log("double-click:", ec)
+  onChartInit(ec:any) {
+    this.echartsInstance = ec;
   }
 
   onChartClick(ec: any) {
@@ -215,19 +217,22 @@ export class AppComponent implements OnInit, OnDestroy {
         if (el.type == "text") {
           el.style.text = ec.name
         }
+        if (el.type == "circle") {
+          el.style.fill = ec.color
+        }
         return el
       })
       this.echartsInstance.setOption(this.options, false)
     }
   }
 
+  onChartDbClick(ec: any) {
+    console.log("double-click:", ec)
+  }
+
   hiddeGraphicChildren(event: any) {
     event.target.parent._children.forEach(function (element: any) {
       element.invisible = true;
     })
-  }
-
-  onChartInit(ec:any) {
-    this.echartsInstance = ec;
   }
 }

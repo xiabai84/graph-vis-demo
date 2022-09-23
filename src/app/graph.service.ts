@@ -10,7 +10,7 @@ export class GraphService {
   constructor(private http: HttpClient) {
   }
 
-  ontology(startLabel: string, startProp: string, startValue: string, endLabel: string, endProp: string, endValue: string): Observable<any> {
+  ontology(): Observable<any> {
     return this.http.get(this.baseURL + '/Ontology')
   }
 

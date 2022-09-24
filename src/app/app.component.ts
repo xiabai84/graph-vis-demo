@@ -21,8 +21,10 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(private graphService: GraphService) {}
 
   name = 'Angular mat-icon';
+  defaultOptions: Array<any> = [];
+  newOption: any = {'name': "", 'scope': "", 'value': "", 'properties': []};
   constraints: Array<any> = [];
-  newConstraint: any = {'name': "", 'scope': "", 'value': "default", 'properties': []};
+  newConstraint: any = {'name': "", 'scope': "", 'value': "", 'property': ""};
   isEditItems: boolean | undefined;
 
   ngOnDestroy(): void {
@@ -31,15 +33,15 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.graphService.ontology()
-      .pipe(take(1))
-      .subscribe(
-      (response) => {
-        this.options = this.getOntology(response);
-      },
-      (error) => {
-        console.error('Request failed with error', error)
-      })
+   this.graphService.ontology()
+    .pipe(take(1))
+    .subscribe(
+    (response) => {
+      this.options = this.getOntology(response);
+    },
+    (error) => {
+      console.error('Request failed with error', error)
+    })
   }
 
   getOntology(response: any) {
@@ -309,11 +311,9 @@ export class AppComponent implements OnInit, OnDestroy {
       })
       this.echartsInstance.setOption(this.options, false)
     }
-    console.log("ec.", ec.data.value.properties)
-    console.log(typeof(ec.data.value.properties))
     let props: Array<string> = ec.data.value.properties
-    this.newConstraint.name = ec.data.value.name
-    this.newConstraint.properties = props
+    this.newOption.name = ec.data.value.name
+    this.newOption.properties = props
   }
 
   hiddeController(event: any) {
@@ -321,27 +321,34 @@ export class AppComponent implements OnInit, OnDestroy {
       element.invisible = true;
     })
     if (event.target.id === "left_ring") {
-      this.newConstraint.scope = "source"
-      this.addFieldValue()
+      this.newOption.scope = "Source"
     }
     if (event.target.id === "right_ring") {
-      this.newConstraint.scope = "target"
-      this.addFieldValue()
+      this.newOption.scope = "Target"
     }
-  }
-
-  addFieldValue() {
-    if (this.constraints.length < 2) {
-      this.constraints.push(this.newConstraint);
-      this.newConstraint = {};
-    }
+    this.defaultOptions.push(this.newOption);
+    this.newConstraint.name = this.newOption.name
+    this.newConstraint.scope = this.newOption.scope
+    this.newConstraint.value = this.newOption.value
+    this.constraints.push(this.newConstraint)
+    this.newOption = {}
+    this.newConstraint = {}
   }
 
   deleteFieldValue(index:any) {
+    this.defaultOptions.splice(index, 1);
     this.constraints.splice(index, 1);
   }
 
   onEditCloseItems() {
     this.isEditItems = !this.isEditItems;
   }
+
+  onQuery() {
+    console.log("current new constraint:", this.newConstraint)
+    console.log("current constraints:", this.constraints)
+    console.log("current new opt:", this.newOption)
+    console.log("current options:", this.defaultOptions)
+  }
+
 }

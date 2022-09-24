@@ -42,69 +42,27 @@ button:disabled {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-
-.heroes {
-  margin: 0 0 2em 0;
-  list-style-type: none;
-  padding: 0;
-  width: 15em;
+table {
+  border-collapse: collapse;
+  font-family: Tahoma, Geneva, sans-serif;
 }
-
-.heroes li {
-  display: flex;
+table td {
+  padding: 15px;
 }
-
-.heroes button {
-  flex: 1;
-  cursor: pointer;
-  position: relative;
-  left: 0;
-  background-color: #EEE;
-  margin: .5em;
-  padding: 0;
-  border-radius: 4px;
-  display: flex;
-  align-items: stretch;
-  height: 1.8em;
+table thead td {
+  background-color: #54585d;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 13px;
+  border: 1px solid #54585d;
 }
-
-.heroes button:hover {
-  color: #2c3a41;
-  background-color: #e6e6e6;
-  left: .1em;
+table tbody td {
+  color: #636363;
+  border: 1px solid #dddfe1;
 }
-
-.heroes button:active {
-  background-color: #525252;
-  color: #fafafa;
+table tbody tr {
+  background-color: #f9fafb;
 }
-
-.heroes button.selected {
-  background-color: black;
-  color: white;
-}
-
-.heroes button.selected:hover {
-  background-color: #505050;
-  color: white;
-}
-
-.heroes button.selected:active {
-  background-color: black;
-  color: white;
-}
-
-.heroes .badge {
-  display: inline-block;
-  font-size: small;
-  color: white;
-  padding: 0.8em 0.7em 0 0.7em;
-  background-color: #405061;
-  line-height: 1em;
-  margin-right: .8em;
-  border-radius: 4px 0 0 4px;
-}
-
-.heroes .name {
-  align-self: center;
+table tbody tr:nth-child(odd) {
+  background-color: #ffffff;
 }

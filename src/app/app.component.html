@@ -11,23 +11,29 @@
 </div>
 
 <div class="row">
-  <table class="table table-striped table-bordered col-lg-4">
+  <table class="table">
     <thead>
       <tr>
-        <th> Ontology
-          <a (click)="onEditCloseItems()" class="text-info float-right">
+        <th> Ontology Constraints
+          <a (click)="onEditCloseItems()" class="text-info">
             <i class="mdi mdi-{{isEditItems ? 'close' : 'pencil'}} mdi-18px"></i>
           </a>
         </th>
       </tr>
+      <tr>
+        <td>Delete</td>
+        <td>Richtung</td>
+        <td>Node Name</td>
+        <td>Attribute</td>
+        <td>Wert</td>
+      </tr>
     </thead>
     <tbody *ngIf="!isEditItems">
       <tr *ngFor="let field of constraints; let i = index">
-        <td *ngIf="field?.name">
-          <i (click)="deleteFieldValue(i)" class="mdi mdi-close"> </i>
-        </td>
+        <td *ngIf="field?.name"> <div (click)="deleteFieldValue(i)" class="mdi mdi-close"> </div> </td>
         <td class="mdi mdi-18px"> {{field.scope}}</td>
         <td class="mdi mdi-18px"> {{field.name}}</td>
+        <td class="mdi mdi-18px"> {{field.property}}</td>
         <td class="mdi mdi-18px"> {{field.value}}</td>
       </tr>
     </tbody>
@@ -45,23 +51,23 @@
           <label class="mdi mdi-18px"> {{field.name}} </label>
         </td>
         <td>
-          <select class="form-control custom-select"
-                  [(ngModel)]="field.properties"
-                  name="props">
-            <option *ngFor="let opt of field.properties; let i = index"> {{opt}} </option>
+          <select class="form-control custom-select" [(ngModel)]="constraints[i].property" name="property">
+            <option *ngFor="let option of defaultOptions[i].properties; let i = index"
+            > {{option}}</option>
           </select>
         </td>
         <td>
-            <input class="mdi mdi-18px form-control" [(ngModel)]="field.value" type="text" name="{{field.value}}">
+            <input class="mdi mdi-18px form-control" [(ngModel)]="constraints[i].value" type="text" name="{{field.value}}">
         </td>
       </tr>
-      <tr>
-        <td>
-          <button (click)="onEditCloseItems()" class="btn btn-primary btn-lg1" type="button">Save Items</button>
-        </td>
-      </tr>
+      <button (click)="onEditCloseItems()" class="btn btn-primary btn-lg1" type="button">Save</button>
     </tbody>
   </table>
 </div>
+
+<div class="query">
+  <button (click)="onQuery()" class="btn btn-primary btn-lg1" type="button">Query</button>
+</div>
+
 
 <router-outlet></router-outlet>

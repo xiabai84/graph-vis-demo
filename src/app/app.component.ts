@@ -15,8 +15,10 @@ interface PreSelected {
 })
 export class AppComponent implements OnInit, OnDestroy {
   private _destroy$ = new Subject<void>();
-  options: any
-  echartsInstance: any
+  ontologyOptions: any
+  ontologyInstance: any
+
+  graphOptions: any
 
   constructor(private graphService: GraphService) {}
 
@@ -37,7 +39,7 @@ export class AppComponent implements OnInit, OnDestroy {
     .pipe(take(1))
     .subscribe(
     (response) => {
-      this.options = this.getOntology(response);
+      this.ontologyOptions = this.getOntology(response);
     },
     (error) => {
       console.error('Request failed with error', error)
@@ -289,7 +291,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   onChartInit(ec:any) {
-    this.echartsInstance = ec;
+    this.ontologyInstance = ec;
   }
 
   onChartClick(ec: any) {
@@ -298,8 +300,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   onChartDbClick(ec: any) {
     if (ec.componentType == 'series') {
-      this.options.graphic.invisible = false;
-      this.options.graphic[0].children.map(function (el: any) {
+      this.ontologyOptions.graphic.invisible = false;
+      this.ontologyOptions.graphic[0].children.map(function (el: any) {
         el.invisible = false;
         if (el.type == "text") {
           el.style.text = ec.name
@@ -309,7 +311,7 @@ export class AppComponent implements OnInit, OnDestroy {
         }
         return el
       })
-      this.echartsInstance.setOption(this.options, false)
+      this.ontologyInstance.setOption(this.ontologyOptions, false)
     }
     let props: Array<string> = ec.data.value.properties
     this.newOption.name = ec.data.value.name
@@ -345,10 +347,23 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   onQuery() {
-    console.log("current new constraint:", this.newConstraint)
-    console.log("current constraints:", this.constraints)
-    console.log("current new opt:", this.newOption)
-    console.log("current options:", this.defaultOptions)
+    let start = this.constraints[0]
+    let end = this.constraints[1]
+    let startLabel = start.name || ""
+    let startProp = start.property || ""
+    let startValue = start.value || ""
+    let endLabel = end.name || ""
+    let endProp = end.property || ""
+    let endValue = end.value || ""
+    this.graphService.shortestPath(startLabel, startProp, startValue, endLabel, endProp, endValue)
+      .pipe(take(1))
+      .subscribe(
+        (response) => {
+          this.graphOptions = this.getGeneratedGraph(response);
+        },
+        (error) => {
+          console.error('Request failed with error', error)
+        })
   }
 
 }

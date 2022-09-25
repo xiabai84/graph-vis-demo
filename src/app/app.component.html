@@ -1,12 +1,12 @@
 
 <div echarts
-     [options]="options"
+     [options]="ontologyOptions"
      [loading]=true
      (chartInit)="onChartInit($event)"
      (chartDblClick)="onChartDbClick($event)"
      (chartClick)="onChartClick($event)"
      class="demo-chart"
-     id="graph"
+     id="ontology"
      style="height:600px; width:1200px;">
 </div>
 
@@ -69,5 +69,12 @@
   <button (click)="onQuery()" class="btn btn-primary btn-lg1" type="button">Query</button>
 </div>
 
+<div echarts
+     [options]="graphOptions"
+     [loading]=true
+     class="demo-graph"
+     id="graph"
+     style="height:600px; width:1200px;">
+</div>
 
 <router-outlet></router-outlet>

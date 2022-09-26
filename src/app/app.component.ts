@@ -3,11 +3,6 @@ import {GraphService} from "./graph.service";
 import {take} from "rxjs/operators";
 import {Subject} from "rxjs";
 
-
-interface PreSelected {
-  name: string;
-}
-
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",
@@ -200,7 +195,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   getGeneratedGraph(response: any) {
     return {
-      animationEasingUpdate: 'quinticInOut',
+      // animationEasingUpdate: 'quinticInOut',
       title: {
         text: 'Auto-Generated-Graph',
         top: 'bottom',
@@ -226,7 +221,6 @@ export class AppComponent implements OnInit, OnDestroy {
           symbol: "circle",
           cursor: "pointer",
           selectedMode: "multiple",
-          animation: true,
           select: {
             label: {
               show: true
@@ -236,7 +230,7 @@ export class AppComponent implements OnInit, OnDestroy {
             edgeLength: 100,
             repulsion: 100,
             gravity: 0.01,
-            friction: 0.5,
+            friction: 0.1,
             layoutAnimation: true
           },
           itemStyle: {
@@ -259,9 +253,7 @@ export class AppComponent implements OnInit, OnDestroy {
             backgroundColor: 'inherit',
             formatter: function (params: any) {
               let properties = ""
-              console.log("params", params)
               Object.keys(params.value).forEach(function (key) {
-                // @ts-ignore
                 properties += key + ": " + params.value[key] + "\n";
               })
               return properties
@@ -276,7 +268,6 @@ export class AppComponent implements OnInit, OnDestroy {
             }
           },
           data: response.nodes.map(function (node: any) {
-            console.log("node", node)
             return node
           }),
           links: response.links.map(function (link: any) {
@@ -292,10 +283,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   onChartInit(ec:any) {
     this.ontologyInstance = ec;
-  }
-
-  onChartClick(ec: any) {
-
   }
 
   onChartDbClick(ec: any) {

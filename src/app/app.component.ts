@@ -342,7 +342,7 @@ export class AppComponent implements OnInit, OnDestroy {
     let endLabel = end.name || ""
     let endProp = end.property || ""
     let endValue = end.value || ""
-    this.graphService.shortestPath(startLabel, startProp, startValue, endLabel, endProp, endValue)
+    this.graphService.dfsPath(startLabel, startProp, startValue, endLabel, endProp, endValue)
       .pipe(take(1))
       .subscribe(
         (response) => {
